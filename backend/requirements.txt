@@ -1,0 +1,7 @@
+# Version ranges are UNVERIFIED: the Stage 1 author had no package-registry
+# access, so none of these were installed or resolved together. Run
+# `pip install -r backend/requirements.txt` and `pip freeze > backend/requirements.lock`
+# on a networked machine, then commit the lock file.
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.30,<1.0
+python-dotenv>=1.0,<2.0

@@ -1,0 +1,17 @@
+# Review of `architecture.md`: corrections and clarifications
+
+The specification is sound in overall design. The points below are places where
+it needed correcting, tightening or an explicit decision for this deployment
+(browser client, laptop-hosted server, Cloudflare Tunnel).
+
+| # | Issue in / gap around the spec | Resolution in this project |
+|---|---|---|
+| 1 | The spec says "client applications" and cites OS-backed key storage. Our client is a **web page**, so there is no OS keystore. | Keys live in the browser (IndexedDB). Non-extractable WebCrypto keys will be used where the chosen protocol library allows it; otherwise secrets are wrapped under a key derived from a user passphrase. Documented as a limitation in Stage 3. |
+| 2 | The spec's threat model treats the server as untrusted for plaintext, but a browser client **downloads its code from that same server**. A malicious or compromised server can ship JavaScript that exfiltrates keys or plaintext. | Stated explicitly in `THREAT_MODEL.md` and `SECURITY.md`. We do not claim protection against this attacker. Mitigations (pinned build hash, SRI, reproducible builds, a native client) are listed as future work. |
+| 3 | The spec lists TLS and E2EE separately (correct) but does not mention that **Cloudflare Tunnel terminates TLS at Cloudflare's edge**. Cloudflare can therefore see HTTP/WebSocket traffic, including metadata and the ciphertext envelopes, and could also serve or alter the JavaScript. | Cloudflare is added to the threat model as an additional on-path party. E2EE still protects message contents from it; it does not protect against it altering the delivered JavaScript. |
+| 4 | Credentials for WebSocket authentication are not specified. Putting a bearer token in the WebSocket URL query string leaks it into proxy and server logs. | Plan: authenticate with a short-lived, single-use ticket obtained over an authenticated HTTPS call, or an auth message as the first frame. Never put the long-lived session token in a URL. |
+| 5 | "Authenticated delivery ACK": the server relays acknowledgements, so a malicious server can forge or suppress them. | Delivery status shown to the sender is documented as *relay-reported*, not cryptographically proven. Ordering and completeness are only as trustworthy as the relay. |
+| 6 | The prekey directory is server-hosted, so a malicious server can substitute a recipient's keys at first contact (the spec acknowledges this). | Safety-number / fingerprint comparison and key-change warnings (Stage 3). Until a contact is verified out of band, first contact is trust-on-first-use, and the UI will say so. |
+| 7 | The spec says "at-least-once" delivery and client deduplication but gives no dedup key. | Messages carry a client-generated UUID; `(sender_id, id)` is the primary key on the server, and the client keeps a processed-ID set persisted atomically with ratchet state. |
+| 8 | The spec's Signal-style option assumes a protocol library is available to the client platform. The official `libsignal` bindings are aimed at native/Node targets. | Library choice is recorded as **provisional** in `protocol-decisions.md` with a verification checklist; no cryptographic code is written before it passes. We will not substitute a homemade protocol if verification fails. |
+| 9 | Retention is left open. | Defaults: queued ciphertext expires after 7 days (`SECURECHAT_MESSAGE_TTL_SECONDS`) and is deleted after acknowledged delivery. See `database-schema.md`. |
