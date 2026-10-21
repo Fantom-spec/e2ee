@@ -372,7 +372,7 @@ describe("identity keys and verification", () => {
     await server.flush();
     assert.deepEqual(texts(alice, BOB), ["hi"]); // not shown yet
     assert.ok(alice.engine.contact(BOB)?.keyChange);
-    assert.ok(!alice.persisted.json!.includes("it is really me") || true); // plaintext was never decrypted
+    assert.equal(JSON.parse(alice.persisted.json!).quarantine.length, 1); // held as ciphertext, not displayed
     assert.equal(alice.ackSnapshots.length >= 1, true);
     await alice.engine.acceptKeyChange(BOB);
     assert.deepEqual(texts(alice, BOB), ["hi", "it is really me"]);
@@ -394,5 +394,115 @@ describe("identity keys and verification", () => {
     await server.flush();
     assert.equal(alice.engine.contact(CAROL)?.displayName, "Carol");
     assert.deepEqual(texts(alice, CAROL), ["hi from carol"]);
+  });
+});
+
+describe("restart, replay and identity handling across restarts", () => {
+  async function exchange(): Promise<void> {
+    await connectBoth();
+    await begin(alice, BOB);
+    await alice.engine.sendMessage(BOB, "first");
+    await server.flush();
+  }
+
+  it("a duplicate delivered after the recipient restarted is still not decrypted again", async () => {
+    await exchange();
+    const sent = server.log[0];
+    server.disconnect(BOB);
+    const bob2 = await makeClient(server, BOB, "bobby", bob.persisted.json!);
+    await server.connect(BOB);
+    await bob2.engine.handleFrame({ type: "message", id: sent.id, from: ALICE, envelope: sent.envelope });
+    assert.deepEqual(texts(bob2, ALICE), ["first"]);
+    assert.equal(bob2.stats.decryptCalls, 0); // dedup happened before any decryption
+  });
+
+  it("a replayed ciphertext under a new id is still rejected after a restart", async () => {
+    await exchange();
+    const sent = server.log[0];
+    server.disconnect(BOB);
+    const bob2 = await makeClient(server, BOB, "bobby", bob.persisted.json!);
+    await server.connect(BOB);
+    await bob2.engine.handleFrame({ type: "message", id: crypto.randomUUID(), from: ALICE, envelope: sent.envelope });
+    assert.deepEqual(texts(bob2, ALICE), ["first"]);
+    assert.ok(systemNotes(bob2, ALICE).some((n) => /discarded/.test(n)));
+  });
+
+  it("a pinned and verified identity survives a restart", async () => {
+    await exchange();
+    await alice.engine.setVerified(BOB, true);
+    server.disconnect(ALICE);
+    const alice2 = await makeClient(server, ALICE, "alice", alice.persisted.json!);
+    assert.equal(alice2.engine.contact(BOB)?.verified, true);
+    assert.equal(alice2.engine.contact(BOB)?.identityKey, alice.engine.contact(BOB)?.identityKey);
+    assert.equal(await alice2.engine.getSafetyNumber(BOB), await alice.engine.getSafetyNumber(BOB));
+  });
+
+  it("a held message and the key-change warning survive a restart", async () => {
+    await exchange();
+    await alice.engine.setVerified(BOB, true);
+    server.disconnect(BOB);
+    const bob2 = await makeClient(server, BOB, "bobby");
+    await server.connect(BOB);
+    await begin(bob2, ALICE);
+    await bob2.engine.sendMessage(ALICE, "from the new key");
+    await server.flush();
+    assert.ok(alice.engine.contact(BOB)?.keyChange);
+    server.disconnect(ALICE);
+    const alice2 = await makeClient(server, ALICE, "alice", alice.persisted.json!);
+    const c = alice2.engine.contact(BOB)!;
+    assert.ok(c.keyChange); // still flagged after a restart
+    assert.equal(c.verified, false); // the old verification was withdrawn
+    await assert.rejects(() => alice2.engine.sendMessage(BOB, "nope"), KeyChangedError);
+    await alice2.engine.acceptKeyChange(BOB);
+    assert.deepEqual(texts(alice2, BOB), ["first", "from the new key"]);
+  });
+
+  it("accepting a key change leaves the contact unverified until re-verified", async () => {
+    await exchange();
+    await alice.engine.setVerified(BOB, true);
+    server.disconnect(BOB);
+    await makeClient(server, BOB, "bobby");
+    await server.connect(BOB);
+    clock.skewMs += 60_000;
+    await assert.rejects(() => alice.engine.sendMessage(BOB, "x"), KeyChangedError);
+    await alice.engine.acceptKeyChange(BOB);
+    const c = alice.engine.contact(BOB)!;
+    assert.equal(c.verified, false);
+    assert.equal(c.verifiedKey, undefined);
+    assert.equal(c.keyChange, undefined);
+  });
+
+  it("a truncated ciphertext is discarded and nothing is shown", async () => {
+    server.tamper = (env) => {
+      const { type, body } = decodeEnvelope(env);
+      return encodeEnvelope(type, body.slice(0, Math.max(1, body.length - 8)));
+    };
+    await connectBoth();
+    await begin(alice, BOB);
+    await alice.engine.sendMessage(BOB, "TRUNCATE-ME");
+    await server.flush();
+    assert.deepEqual(texts(bob, ALICE), []);
+    assert.ok(systemNotes(bob, ALICE).some((n) => /could not be verified or decrypted/.test(n)));
+  });
+
+  it("a message with an unknown type field is discarded as unreadable", async () => {
+    await connectBoth();
+    await begin(alice, BOB);
+    await alice.engine.sendMessage(BOB, "typed");
+    await server.flush();
+    const forged = btoa(JSON.stringify({ v: 1, t: 9, b: "AAAA" }));
+    await bob.engine.handleFrame({ type: "message", id: crypto.randomUUID(), from: ALICE, envelope: forged });
+    assert.deepEqual(texts(bob, ALICE), ["typed"]);
+    assert.ok(systemNotes(bob, ALICE).some((n) => /unreadable format/.test(n)));
+  });
+
+  it("a failed message does not leave plaintext or private keys in what the relay saw", async () => {
+    await connectBoth();
+    await begin(alice, BOB);
+    await alice.engine.sendMessage(BOB, "MARKER-NOT-ON-RELAY");
+    await server.flush();
+    const seen = JSON.stringify([server.frames, server.log, server.messages]);
+    assert.ok(!seen.includes("MARKER-NOT-ON-RELAY"));
+    assert.ok(!seen.includes(JSON.parse(alice.persisted.json!).identity.priv)); // private identity key never left the client
   });
 });

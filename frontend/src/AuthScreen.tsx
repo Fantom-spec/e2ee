@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+﻿import { FormEvent, useState } from "react";
 import { api, ApiError, LoginResult } from "./api";
 
 interface Props {
@@ -80,7 +80,7 @@ export default function AuthScreen({ onLoggedIn }: Props) {
           </p>
         )}
         <button type="submit" disabled={busy}>
-          {busy ? "Please wait…" : register ? "Register and log in" : "Log in"}
+          {busy ? "Please wait..." : register ? "Register and log in" : "Log in"}
         </button>
       </form>
       <p>
@@ -103,3 +103,4 @@ export default function AuthScreen({ onLoggedIn }: Props) {
     </section>
   );
 }
+

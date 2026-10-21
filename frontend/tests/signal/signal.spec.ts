@@ -1,6 +1,6 @@
-// Tests of the REAL protocol library through the real engine. Run: npm run test:signal
-// (requires `npm install`). Not executed in the development sandbox (no npm access);
-// results must be produced on a machine with the dependencies installed.
+﻿// Tests of the REAL protocol library through the real engine. Run: npm run test:signal
+// (requires `npm install`). These have NOT been executed in the environments used to write
+// them (npm was blocked), so no result is claimed; run them and keep the output as evidence.
 import { describe, expect, it, beforeEach } from "vitest";
 
 import { decodeEnvelope, encodeEnvelope } from "../../src/crypto/envelope.ts";
@@ -88,6 +88,62 @@ describe("real Signal protocol through the chat engine", () => {
     await alice.engine.sendMessage(BOB, "after accept");
     await server.flush();
     expect(texts(bob2, ALICE)).toEqual(["after accept"]);
+  });
+
+  /** Alice and Bob each send once, so Alice's next message is an ordinary ratchet message (type 1), not a pre-key message. */
+  async function establish(): Promise<void> {
+    await alice.engine.sendMessage(BOB, "a1");
+    await server.flush();
+    await bob.engine.startConversation(server.users.get(ALICE)!.profile);
+    await bob.engine.sendMessage(ALICE, "b1");
+    await server.flush();
+  }
+
+  it("rejects a ciphertext whose MAC was altered (ordinary ratchet message)", async () => {
+    await establish();
+    server.tamper = (env) => {
+      const { type, body } = decodeEnvelope(env);
+      expect(type).toBe(1); // the last 8 bytes of a type-1 message are the MAC
+      body[body.length - 1] ^= 1;
+      return encodeEnvelope(type, body);
+    };
+    await alice.engine.sendMessage(BOB, "MAC-TAMPER");
+    await server.flush();
+    expect(bob.engine.messagesFor(ALICE).filter((m) => m.kind === "message" && m.dir === "in").map((m) => m.text)).toEqual(["a1"]);
+    expect(bob.persisted.json).not.toContain("MAC-TAMPER");
+  });
+
+  it("rejects a truncated ciphertext", async () => {
+    await establish();
+    server.tamper = (env) => {
+      const { type, body } = decodeEnvelope(env);
+      return encodeEnvelope(type, body.slice(0, body.length - 12));
+    };
+    await alice.engine.sendMessage(BOB, "TRUNCATED");
+    await server.flush();
+    expect(bob.engine.messagesFor(ALICE).filter((m) => m.kind === "message" && m.dir === "in").map((m) => m.text)).toEqual(["a1"]);
+  });
+
+  it("encrypts the same plaintext to different ciphertext every time (the ratchet advances)", async () => {
+    await establish();
+    await alice.engine.sendMessage(BOB, "same words");
+    await alice.engine.sendMessage(BOB, "same words");
+    await server.flush();
+    const bodies = server.log.filter((m) => m.from === ALICE).slice(-2).map((m) => m.envelope);
+    expect(bodies[0]).not.toBe(bodies[1]);
+    expect(texts(bob, ALICE).slice(-2)).toEqual(["same words", "same words"]);
+  });
+
+  it("decrypts messages that arrive out of order (skipped message keys)", async () => {
+    await establish();
+    server.disconnect(BOB); // hold delivery so the test controls the order
+    for (const t of ["o1", "o2", "o3"]) await alice.engine.sendMessage(BOB, t);
+    await server.flush(); // the relay queues them (Bob is offline) and records the envelopes
+    const sent = server.log.filter((m) => m.from === ALICE).slice(-3);
+    for (const m of [sent[2], sent[0], sent[1]]) {
+      await bob.engine.handleFrame({ type: "message", id: m.id, from: ALICE, envelope: m.envelope });
+    }
+    expect(texts(bob, ALICE).slice(-3).sort()).toEqual(["o1", "o2", "o3"]);
   });
 
   it("survives a restart from persisted state with the real ratchet", async () => {

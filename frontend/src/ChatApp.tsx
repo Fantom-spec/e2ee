@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+﻿import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { directoryApi, User } from "./api";
 import ChatWindow from "./ChatWindow";
 import type { ChatEngine } from "./crypto/engine.ts";
@@ -7,9 +7,9 @@ import UserSearch from "./UserSearch";
 import { RelayLink, RelayStatus, useRelay } from "./useRelay";
 
 const STATUS_TEXT: Record<RelayStatus, string> = {
-  connecting: "Connecting to relay…",
+  connecting: "Connecting to relay...",
   online: "Relay connected",
-  offline: "Relay disconnected, retrying…",
+  offline: "Relay disconnected, retrying...",
   "session-ended": "Session ended",
 };
 
@@ -48,11 +48,17 @@ export default function ChatApp({ token, user, password, onLogout, onSessionEnde
       </section>
     );
   }
-  if (!engine) return <p>Unlocking your encryption keys…</p>;
+  if (!engine) return <p>Unlocking your encryption keys...</p>;
 
   return (
     <Ready engine={engine} token={token} user={user} status={status} peerId={peerId} setPeerId={setPeerId} onLogout={onLogout} />
   );
+}
+
+function trustBadge(c: { verified: boolean; keyChange?: unknown }): { cls: string; text: string; label: string } {
+  if (c.keyChange) return { cls: "badge danger", text: "! Key changed", label: "Safety number changed" };
+  if (c.verified) return { cls: "badge ok", text: "Verified", label: "Safety number verified" };
+  return { cls: "badge warn", text: "unverified", label: "Safety number not verified" };
 }
 
 function Ready(props: {
@@ -73,43 +79,66 @@ function Ready(props: {
     }
   };
 
-  return (
-    <>
-      <section className="card">
-        <h2>{user.display_name} <span className="muted">@{user.username}</span></h2>
-        <p className={status === "online" ? "ok" : "muted"} aria-live="polite">{STATUS_TEXT[status]}</p>
-        {engine.hasFailed && (
-          <p className="banner danger" role="alert">
-            Saving to this browser failed, so chat is stopped to protect your messages. Reload and log in again.
-          </p>
-        )}
-        {engine.notice && <p className="banner" role="status">{engine.notice}</p>}
-        <button type="button" onClick={onLogout}>Log out</button>
-      </section>
+  const conversations = engine.conversations();
 
-      {peerId ? (
-        <ChatWindow engine={engine} peerId={peerId} onBack={() => setPeerId(null)} />
-      ) : (
-        <>
-          <section className="card">
-            <h2>Conversations</h2>
-            {engine.conversations().length === 0 && <p className="muted">None yet. Find someone below.</p>}
-            <ul className="list">
-              {engine.conversations().map(({ contact, last }) => (
+  return (
+    <div className="layout" data-view={peerId ? "chat" : "list"}>
+      <aside className="sidebar" aria-label="Conversations">
+        <section className="card">
+          <h2>{user.display_name} <span className="muted">@{user.username}</span></h2>
+          <p className={status === "online" ? "ok" : "muted"} aria-live="polite">{STATUS_TEXT[status]}</p>
+          {engine.hasFailed && (
+            <p className="banner danger" role="alert">
+              Saving to this browser failed, so chat is stopped to protect your messages. Reload and log in again.
+            </p>
+          )}
+          {engine.notice && <p className="banner" role="status">{engine.notice}</p>}
+          <button type="button" onClick={onLogout}>Log out</button>
+        </section>
+
+        <section className="card">
+          <h2>Conversations</h2>
+          {conversations.length === 0 && <p className="muted">None yet. Find someone below.</p>}
+          <ul className="convs">
+            {conversations.map(({ contact, last }) => {
+              const badge = trustBadge(contact);
+              return (
                 <li key={contact.userId}>
-                  <button type="button" className="link" onClick={() => setPeerId(contact.userId)}>
-                    <strong>{contact.displayName}</strong> <span className="muted">@{contact.username}</span>
-                    {contact.keyChange && <span className="err"> ⚠ safety number changed</span>}
-                    {last && last.kind === "message" && <div className="muted preview">{last.dir === "out" ? "You: " : ""}{last.text.slice(0, 60)}</div>}
+                  <button
+                    type="button"
+                    className={`conv${contact.userId === peerId ? " active" : ""}`}
+                    aria-current={contact.userId === peerId ? "true" : undefined}
+                    onClick={() => setPeerId(contact.userId)}
+                  >
+                    <span className="conv-top">
+                      <strong>{contact.displayName}</strong>
+                      <span className={badge.cls} title={badge.label}>{badge.text}</span>
+                    </span>
+                    <span className="muted small">@{contact.username}</span>
+                    {last && last.kind === "message" && (
+                      <span className="muted preview">{last.dir === "out" ? "You: " : ""}{last.text.slice(0, 60)}</span>
+                    )}
                   </button>
                 </li>
-              ))}
-            </ul>
+              );
+            })}
+          </ul>
+        </section>
+        {startError && <p className="err" role="alert">{startError}</p>}
+        <UserSearch token={token} onSelect={(u) => void open(u)} />
+      </aside>
+
+      <div className="main">
+        {peerId ? (
+          <ChatWindow key={peerId} engine={engine} peerId={peerId} onBack={() => setPeerId(null)} />
+        ) : (
+          <section className="card placeholder">
+            <h2>Select a conversation</h2>
+            <p className="muted">Pick a contact on the left, or search for someone to start an end-to-end encrypted chat.</p>
           </section>
-          {startError && <p className="err" role="alert">{startError}</p>}
-          <UserSearch token={token} onSelect={(u) => void open(u)} />
-        </>
-      )}
-    </>
+        )}
+      </div>
+    </div>
   );
 }
+
