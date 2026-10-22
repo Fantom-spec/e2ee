@@ -1,5 +1,7 @@
 # Protocol and design decisions
 
+See `crypto-design.md` for the client cryptography design, licensing and limitations.
+
 Status legend: **Decided**, **Provisional** (must pass the stated check before
 use), **Open**.
 

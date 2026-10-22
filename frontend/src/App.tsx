@@ -33,11 +33,15 @@ export default function App() {
   return (
     <main className="shell">
       <h1>SecureChat</h1>
-      <p className="banner" role="note">
-        Messages are end-to-end encrypted in this browser (Signal protocol via an unaudited
-        third-party library). The server could still serve modified page code, so verify safety
-        numbers with your contacts. Reloading the page requires logging in again.
-      </p>
+      <details className="banner intro">
+        <summary>Messages are end-to-end encrypted in this browser</summary>
+        <p>
+          Encryption uses the Signal protocol (X3DH and Double Ratchet) through an unaudited
+          third-party library. The server could still serve modified page code, and it cannot
+          stop someone replacing a contact's key, so compare safety numbers with your contacts.
+          Reloading the page requires logging in again.
+        </p>
+      </details>
       {notice && <p className="banner">{notice}</p>}
       {auth ? (
         <ChatApp token={auth.token} user={auth.user} password={auth.password} onLogout={handleLogout} onSessionEnded={handleSessionEnded} />

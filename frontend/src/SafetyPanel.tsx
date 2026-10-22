@@ -1,8 +1,35 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import type { ChatEngine } from "./crypto/engine.ts";
 
-function Digits({ value }: { value: string | null }) {
-  return <code className="digits">{value ?? "…"}</code>;
+/** 12 groups of 5 digits, laid out as a grid so two people can read it aloud group by group. */
+function Digits({ value, label }: { value: string | null; label: string }) {
+  if (value === null) return <p className="muted">…</p>;
+  return (
+    <div className="digits" role="group" aria-label={label}>
+      {value.split(" ").map((g, i) => (
+        <code key={i}>{g}</code>
+      ))}
+    </div>
+  );
+}
+
+function CopyButton({ value }: { value: string | null }) {
+  const [done, setDone] = useState(false);
+  if (!value) return null;
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setDone(true);
+      window.setTimeout(() => setDone(false), 2000);
+    } catch {
+      setDone(false); // clipboard unavailable: the digits are selectable on screen
+    }
+  };
+  return (
+    <button type="button" className="secondary" onClick={() => void copy()}>
+      {done ? "Copied" : "Copy number"}
+    </button>
+  );
 }
 
 export default function SafetyPanel({ engine, peerId }: { engine: ChatEngine; peerId: string }) {
@@ -37,19 +64,28 @@ export default function SafetyPanel({ engine, peerId }: { engine: ChatEngine; pe
     <div className="safety">
       {changed ? (
         <>
-          <p><strong>New safety number</strong> (the contact's key changed). Compare it with {contact.displayName} over a channel you trust, such as a call:</p>
-          <Digits value={pending} />
-          <p className="muted">Previously: <Digits value={current} /></p>
+          <p>
+            <strong>New safety number.</strong> Compare it with {contact.displayName} over a channel you trust, such as
+            a phone call. If it does not match what they read out, do not accept it.
+          </p>
+          <Digits value={pending} label="New safety number" />
+          <CopyButton value={pending} />
+          <p className="muted">Previous number (no longer in use):</p>
+          <Digits value={current} label="Previous safety number" />
           <button type="button" onClick={() => void run(() => engine.acceptKeyChange(peerId))}>
-            Accept the new key (unverified)
+            Accept the new key (stays unverified)
           </button>
         </>
       ) : current ? (
         <>
-          <p>Compare these digits with {contact.displayName} over a channel you trust. If they match, nobody is intercepting this conversation.</p>
-          <Digits value={current} />
+          <p>
+            Compare these digits with {contact.displayName} over a channel you trust. If they match exactly, nobody is
+            intercepting this conversation.
+          </p>
+          <Digits value={current} label="Safety number" />
+          <CopyButton value={current} />
           <button type="button" onClick={() => void run(() => engine.setVerified(peerId, !contact.verified))}>
-            {contact.verified ? "Remove verified mark" : "Mark as verified"}
+            {contact.verified ? "Remove verified mark" : "They match: mark as verified"}
           </button>
         </>
       ) : (
