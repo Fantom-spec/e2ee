@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { directoryApi, User } from "./api";
 import ChatWindow from "./ChatWindow";
 import type { ChatEngine } from "./crypto/engine.ts";

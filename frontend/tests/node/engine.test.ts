@@ -457,6 +457,22 @@ describe("restart, replay and identity handling across restarts", () => {
     assert.deepEqual(texts(alice2, BOB), ["first", "from the new key"]);
   });
 
+  it("notifies the UI when sending discovers that the contact's key changed (so the list and badges refresh)", async () => {
+    await exchange();
+    await alice.engine.setVerified(BOB, true);
+    server.disconnect(BOB);
+    await makeClient(server, BOB, "bobby");
+    await server.connect(BOB);
+    clock.skewMs += 60_000;
+    let notified = 0;
+    alice.engine.subscribe(() => notified++);
+    const before = alice.engine.getVersion();
+    await assert.rejects(() => alice.engine.sendMessage(BOB, "x"), KeyChangedError);
+    assert.ok(alice.engine.getVersion() > before);
+    assert.ok(notified > 0);
+    assert.ok(alice.engine.contact(BOB)?.keyChange);
+  });
+
   it("accepting a key change leaves the contact unverified until re-verified", async () => {
     await exchange();
     await alice.engine.setVerified(BOB, true);

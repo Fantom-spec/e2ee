@@ -1,4 +1,4 @@
-﻿// Tests of the REAL protocol library through the real engine. Run: npm run test:signal
+// Tests of the REAL protocol library through the real engine. Run: npm run test:signal
 // (requires `npm install`). These have NOT been executed in the environments used to write
 // them (npm was blocked), so no result is claimed; run them and keep the output as evidence.
 import { describe, expect, it, beforeEach } from "vitest";

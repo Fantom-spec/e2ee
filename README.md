@@ -1,11 +1,6 @@
 # SecureChat: end-to-end encrypted chat (Computer Networks project)
 
-> **Status: Stage 3 development checkpoint.** Accounts, the relay, a public-key
-> directory, client-side Signal-protocol encryption and a chat UI are written.
-> The encryption glue (`frontend/src/crypto/signal.ts`), its real-library tests
-> and the React UI have **never been run** (no npm access where this was
-> written). Do not use it for private conversations until you have run the
-> tests listed in `PROGRESS.md`.
+> **Status: Stage 3 frontend verification checkpoint.** The frontend unit tests, real Signal-library tests and production build have been run successfully. This remains an unaudited academic project; passing tests do not establish safety for sensitive real-world communications.
 
 ## What this is
 
@@ -16,7 +11,7 @@ laptop, exposed with Cloudflare Tunnel.
 
 * Frontend: React + TypeScript (Vite)
 * Backend: Python FastAPI, WebSocket relay, SQLite
-* Crypto: `@privacyresearch/libsignal-protocol-typescript` 0.0.16 (Signal protocol; GPL-3.0, unaudited, see `docs/protocol-decisions.md`); no homemade cryptography
+* Crypto: `@privacyresearch/libsignal-protocol-typescript` 0.0.16 (Signal protocol; GPL-3.0, unaudited, see `docs/protocol-decisions.md` and `docs/crypto-design.md`); no homemade cryptography
 * Public access: Cloudflare Tunnel (no Docker, no cloud backend)
 
 ## What exists today (Stage 3)
@@ -101,8 +96,9 @@ Windows unittest form: `$env:PYTHONPATH="backend"; python -m unittest discover -
 Frontend (from `frontend/`, after `npm install`):
 
 ```bash
-npm run test:unit     # Node built-in runner: primitives + engine logic with a FAKE cipher (51 tests)
-npm run test:signal   # vitest: the REAL Signal library through the engine (7 tests)
+npm run test:unit     # Node built-in runner: primitives + engine logic with a FAKE cipher (60 tests)
+npm run test:signal   # vitest: the REAL Signal library through the engine (11 tests)
+npm test              # Run both frontend test suites
 ```
 
 Housekeeping check before sharing a ZIP: `python scripts/check_secrets.py`
@@ -112,7 +108,7 @@ Housekeeping check before sharing a ZIP: `python scripts/check_secrets.py`
 | Stage | Content |
 |---|---|
 | 2 | **Done (partly unverified):** see above |
-| 3 | **Written; crypto glue, UI and real-library tests unexecuted** |
+| 3 | **Frontend tests and production build pass; browser/backend integration still needs verification** |
 | 4 | Reliability and hardening, CSP, remaining security tests |
 | 5 | Responsive UI, benchmark script, Cloudflare Tunnel guide, demo guide |
 | 6 | Full verification and `SecureChat_FINAL.zip` |
@@ -132,7 +128,7 @@ exist, and unverified instructions would be misleading.
 | Login returns 429 | Rate limit hit (5 failures per username / 5 min). Wait, or restart the backend in development. |
 | Relay stays on "disconnected, retrying" | Check the backend terminal; the frontend dev proxy must forward `/ws` (it does when `VITE_DEV_BACKEND_URL` is set) and the page origin must be in `SECURECHAT_ALLOWED_ORIGINS`. |
 | Browser CORS error when `VITE_API_BASE_URL` is set | Add that origin to `SECURECHAT_ALLOWED_ORIGINS`. |
-| `pip` or `npm` dependency conflicts | Version ranges were never resolved by the author; adjust ranges and commit the resulting lock files. |
+| `pip` or `npm` dependency conflicts | Run npm audit in frontend/; review GPL-3.0-only licensing separately. |
 
 ## Security notice
 
@@ -140,3 +136,4 @@ Read `SECURITY.md` and `THREAT_MODEL.md`. In particular: a browser E2EE app
 downloads its code from the server, so a malicious server can steal keys, and
 Cloudflare Tunnel terminates TLS at Cloudflare. This project does not defend
 against either.
+

@@ -3,12 +3,12 @@
 This is an academic project and has **not** been independently reviewed or
 audited. Do not use it to protect sensitive real-world communications.
 
-## Current claims (Stage 3 development checkpoint)
+## Current security status (Stage 3 frontend verification)
 
 | Property | Claimed? | Evidence |
 |---|---|---|
-| End-to-end encryption of messages (Signal protocol via a third-party library) | **Implemented, NOT YET VERIFIED**: the real-library tests (`frontend/tests/signal/`) have not been run | none executed yet |
-| Engine handles duplicates, replays, tampered results, key changes, offline retry and storage failure correctly | Yes, against a FAKE cipher | `frontend/tests/node/engine.test.ts`, 30 tests executed, passing |
+| End-to-end encryption of messages (Signal protocol via a third-party library) | **Implemented; automated tests pass, but not independently audited** | `frontend/tests/signal/`: 11 real-library tests pass |
+| Engine handles duplicates, replays, tampered results, key changes, offline retry and storage failure correctly | Yes, against a FAKE cipher | `frontend/tests/node/engine.test.ts`, 38 tests executed, passing (includes restart, replay-after-restart, truncation and held-message-after-restart cases) |
 | Local keys and history encrypted at rest (AES-256-GCM, PBKDF2 600k) | Yes (vault logic) | `frontend/tests/node/primitives.test.ts`, executed, passing. IndexedDB storage itself never run |
 | Server stores only public keys; one-time prekeys consumed atomically; identity change recorded | Yes (service level) | `tests/backend/test_keys_service.py`, executed, passing |
 | Forward secrecy / post-compromise security | **No claim** (library feature, no test of ours) | none |
@@ -17,7 +17,7 @@ audited. Do not use it to protect sensitive real-world communications.
 | Passwords stored only as scrypt hashes; login failures indistinguishable; sessions expire and can be revoked; only a keyed digest of the session token is stored | Yes (service level) | `test_security.py`, `test_auth_service.py`: executed, passing |
 | Relay derives sender from the session, rejects spoofed senders, scopes acknowledgements to the recipient, rejects malformed/oversized frames, is duplicate-safe, enforces rate/queue/connection limits | Yes (relay level, fake sockets, real SQLite) | `test_relay.py`: executed, passing |
 | The same behaviour through real HTTP and WebSocket endpoints (CORS allow-list, docs off in production, 401s, 422 bodies not echoing passwords, ticket single-use, origin check) | **Written, unverified** | `test_api.py`, `test_health.py`: skipped here because FastAPI could not be installed; never executed |
-| React UI behaviour | **Unverified** | Never built or run in the authoring sandbox |
+| React UI behaviour (responsive layout, trust badges, warnings) | **Build passes; full browser/backend integration not verified** | `npm run build` succeeds; manual UI and live-backend testing remain necessary. See `docs/crypto-design.md` section 9 |
 
 ## Limits of the current controls
 
@@ -28,7 +28,7 @@ audited. Do not use it to protect sensitive real-world communications.
 * Safety numbers are SecureChat's own construction (SHA-512 over ordered user ids and identity keys) and do not interoperate with Signal.
 * The server cannot verify the signed prekey signature; clients do (inside the library).
 * Search lets any logged-in user enumerate usernames by prefix (capped at 20 results, rate limiting of search is not implemented).
-* Until you have run the real-library tests and verified safety numbers with your contact, do not rely on this for anything private.
+* Although the real-library tests pass, verify identity and safety numbers with a second account. Do not rely on this unaudited academic project for sensitive private communications.
 
 ## Things to keep in mind
 
@@ -42,3 +42,18 @@ audited. Do not use it to protect sensitive real-world communications.
 This is a student project: open an issue or contact the repository owner
 directly. Do not post exploit details publicly before the owner has had a
 chance to respond.
+
+## Third-party dependency licensing
+
+The frontend dependency report (`frontend/licenses.json`) identifies these
+Signal-related packages as GPL-3.0-only:
+
+- `@privacyresearch/curve25519-typescript@0.0.12`
+- `@privacyresearch/libsignal-protocol-protobuf-ts@0.0.9`
+- `@privacyresearch/libsignal-protocol-typescript@0.0.16`
+
+Other dependencies have their own licence terms. Review the licence files
+and applicable obligations before distributing this project. This note is
+a dependency inventory, not a legal determination of compatibility or
+redistribution rights.
+

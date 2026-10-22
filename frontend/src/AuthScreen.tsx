@@ -1,4 +1,4 @@
-﻿import { FormEvent, useState } from "react";
+import { FormEvent, useState } from "react";
 import { api, ApiError, LoginResult } from "./api";
 
 interface Props {

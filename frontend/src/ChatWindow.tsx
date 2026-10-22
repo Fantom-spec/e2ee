@@ -21,8 +21,12 @@ export default function ChatWindow({ engine, peerId, onBack }: { engine: ChatEng
   const messages = engine.messagesFor(peerId);
 
   useEffect(() => {
-    void engine.refreshPeerIdentity(peerId); const timer = window.setInterval(() => void engine.refreshPeerIdentity(peerId), 15000);
-  return () => window.clearInterval(timer); }, [engine, peerId]);
+    // Check when the chat opens, then every 15 s while it stays open, so a contact's new key is
+    // noticed even on wide screens where the conversation list and chat are visible together.
+    void engine.refreshPeerIdentity(peerId);
+    const timer = window.setInterval(() => void engine.refreshPeerIdentity(peerId), 15_000);
+    return () => window.clearInterval(timer);
+  }, [engine, peerId]);
   useEffect(() => {
     bottom.current?.scrollIntoView?.({ block: "end" });
   }, [messages.length]);
