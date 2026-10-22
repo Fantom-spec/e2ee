@@ -1,0 +1,3 @@
+2026-10-23T00:19:07 | Windows-11-10.0.26200-SP0 | Python 3.12.5 | CPUs 16 | base=http://127.0.0.1:8000 | count=100 rate=2.5/s repeats=3
+
+offline drain: {"queued": 100, "pending_at_connect": 100, "received": 100, "drain_seconds": 0.06464560003951192, "errors": []}
