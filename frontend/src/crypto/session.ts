@@ -27,7 +27,22 @@ export interface OpenOptions {
  * first use) and return a ready ChatEngine. A wrong password or tampered
  * storage makes unlock fail; we never fall back to creating new keys over it.
  */
-export async function openEngine(opts: OpenOptions): Promise<ChatEngine> {
+export function openEngine(opts: OpenOptions): Promise<ChatEngine> {
+  // React StrictMode (development) mounts effects twice. Two concurrent unlocks of a brand-new
+  // account would each see "no vault yet", generate DIFFERENT identity keys and race to write
+  // them. Concurrent calls for the same user and socket link therefore share one in-flight attempt.
+  const pending = inFlight.get(opts.userId);
+  if (pending && pending.sendFrame === opts.sendFrame) return pending.promise;
+  const promise = openEngineOnce(opts).finally(() => {
+    if (inFlight.get(opts.userId)?.promise === promise) inFlight.delete(opts.userId);
+  });
+  inFlight.set(opts.userId, { sendFrame: opts.sendFrame, promise });
+  return promise;
+}
+
+const inFlight = new Map<string, { sendFrame: OpenOptions["sendFrame"]; promise: Promise<ChatEngine> }>();
+
+async function openEngineOnce(opts: OpenOptions): Promise<ChatEngine> {
   if (!globalThis.isSecureContext || !globalThis.crypto?.subtle || !globalThis.indexedDB) {
     throw new UnlockError("This page needs HTTPS (or localhost) and a browser with Web Crypto and IndexedDB.");
   }

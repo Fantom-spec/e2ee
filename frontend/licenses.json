@@ -1,0 +1,214 @@
+{
+  "@privacyresearch/curve25519-typescript@0.0.12": {
+    "licenses": "GPL-3.0-only",
+    "repository": "https://github.com/privacyresearchgroup/curve25519-typescript",
+    "publisher": "Rolfe Schmidt",
+    "email": "rolfeschmidt@gmail.com",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@privacyresearch\\curve25519-typescript",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@privacyresearch\\curve25519-typescript\\LICENSE"
+  },
+  "@privacyresearch/libsignal-protocol-protobuf-ts@0.0.9": {
+    "licenses": "GPL-3.0-only",
+    "repository": "https://github.com/privacyresearchgroup/libsignal-protocol-protobuf-ts",
+    "publisher": "Rolfe Schmidt",
+    "email": "rolfeschmidt@gmail.com",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@privacyresearch\\libsignal-protocol-protobuf-ts",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@privacyresearch\\libsignal-protocol-protobuf-ts\\LICENSE"
+  },
+  "@privacyresearch/libsignal-protocol-typescript@0.0.16": {
+    "licenses": "GPL-3.0-only",
+    "repository": "https://github.com/privacyresearchgroup/libsignal-protocol-typescript",
+    "publisher": "Rolfe Schmidt",
+    "email": "rolfeschmidt@gmail.com",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@privacyresearch\\libsignal-protocol-typescript",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@privacyresearch\\libsignal-protocol-typescript\\LICENSE"
+  },
+  "@protobufjs/aspromise@1.1.2": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/dcodeIO/protobuf.js",
+    "publisher": "Daniel Wirtz",
+    "email": "dcode+protobufjs@dcode.io",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@protobufjs\\aspromise",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@protobufjs\\aspromise\\LICENSE"
+  },
+  "@protobufjs/base64@1.1.2": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/dcodeIO/protobuf.js",
+    "publisher": "Daniel Wirtz",
+    "email": "dcode+protobufjs@dcode.io",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@protobufjs\\base64",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@protobufjs\\base64\\LICENSE"
+  },
+  "@protobufjs/codegen@2.0.5": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/dcodeIO/protobuf.js",
+    "publisher": "Daniel Wirtz",
+    "email": "dcode+protobufjs@dcode.io",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@protobufjs\\codegen",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@protobufjs\\codegen\\LICENSE"
+  },
+  "@protobufjs/eventemitter@1.1.1": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/dcodeIO/protobuf.js",
+    "publisher": "Daniel Wirtz",
+    "email": "dcode+protobufjs@dcode.io",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@protobufjs\\eventemitter",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@protobufjs\\eventemitter\\LICENSE"
+  },
+  "@protobufjs/fetch@1.1.1": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/dcodeIO/protobuf.js",
+    "publisher": "Daniel Wirtz",
+    "email": "dcode+protobufjs@dcode.io",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@protobufjs\\fetch",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@protobufjs\\fetch\\LICENSE"
+  },
+  "@protobufjs/float@1.0.2": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/dcodeIO/protobuf.js",
+    "publisher": "Daniel Wirtz",
+    "email": "dcode+protobufjs@dcode.io",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@protobufjs\\float",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@protobufjs\\float\\LICENSE"
+  },
+  "@protobufjs/path@1.1.2": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/dcodeIO/protobuf.js",
+    "publisher": "Daniel Wirtz",
+    "email": "dcode+protobufjs@dcode.io",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@protobufjs\\path",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@protobufjs\\path\\LICENSE"
+  },
+  "@protobufjs/pool@1.1.0": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/dcodeIO/protobuf.js",
+    "publisher": "Daniel Wirtz",
+    "email": "dcode+protobufjs@dcode.io",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@protobufjs\\pool",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@protobufjs\\pool\\LICENSE"
+  },
+  "@protobufjs/utf8@1.1.2": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/protobufjs/protobuf.js",
+    "publisher": "Daniel Wirtz",
+    "email": "dcode+protobufjs@dcode.io",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@protobufjs\\utf8",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@protobufjs\\utf8\\LICENSE"
+  },
+  "@types/node@22.20.5": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@types\\node",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\@types\\node\\LICENSE"
+  },
+  "base64-js@1.5.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/beatgammit/base64-js",
+    "publisher": "T. Jameson Little",
+    "email": "t.jameson.little@gmail.com",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\base64-js",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\base64-js\\LICENSE"
+  },
+  "case-anything@2.1.13": {
+    "licenses": "MIT",
+    "repository": "https://github.com/mesqueeb/case-anything",
+    "publisher": "Luca Ban - Mesqueeb",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\case-anything",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\case-anything\\LICENSE"
+  },
+  "detect-libc@1.0.3": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/lovell/detect-libc",
+    "publisher": "Lovell Fuller",
+    "email": "npm@lovell.info",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\detect-libc",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\detect-libc\\LICENSE"
+  },
+  "dprint-node@1.0.8": {
+    "licenses": "MIT",
+    "repository": "https://github.com/devongovett/dprint-node",
+    "publisher": "Devon Govett",
+    "email": "devongovett@gmail.com",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\dprint-node",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\dprint-node\\LICENSE"
+  },
+  "js-tokens@4.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/lydell/js-tokens",
+    "publisher": "Simon Lydell",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\js-tokens",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\js-tokens\\LICENSE"
+  },
+  "long@5.3.2": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/dcodeIO/long.js",
+    "publisher": "Daniel Wirtz",
+    "email": "dcode@dcode.io",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\long",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\long\\LICENSE"
+  },
+  "loose-envify@1.4.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/zertosh/loose-envify",
+    "publisher": "Andres Suarez",
+    "email": "zertosh@gmail.com",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\loose-envify",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\loose-envify\\LICENSE"
+  },
+  "protobufjs@7.6.6": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/protobufjs/protobuf.js",
+    "publisher": "Daniel Wirtz",
+    "email": "dcode+protobufjs@dcode.io",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\protobufjs",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\protobufjs\\LICENSE"
+  },
+  "react-dom@18.3.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/facebook/react",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\react-dom",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\react-dom\\LICENSE"
+  },
+  "react@18.3.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/facebook/react",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\react",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\react\\LICENSE"
+  },
+  "scheduler@0.23.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/facebook/react",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\scheduler",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\scheduler\\LICENSE"
+  },
+  "securechat-frontend@0.1.0": {
+    "licenses": "UNLICENSED",
+    "private": true,
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend"
+  },
+  "ts-poet@6.12.0": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/stephenh/ts-poet",
+    "publisher": "Stephen Haberman",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\ts-poet",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\ts-poet\\LICENSE.txt"
+  },
+  "ts-proto-descriptors@1.16.0": {
+    "licenses": "ISC",
+    "repository": "https://github.com/stephenh/ts-proto",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\ts-proto-descriptors"
+  },
+  "ts-proto@1.181.2": {
+    "licenses": "ISC",
+    "repository": "https://github.com/stephenh/ts-proto",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\ts-proto",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\ts-proto\\LICENSE"
+  },
+  "undici-types@6.21.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/nodejs/undici",
+    "path": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\undici-types",
+    "licenseFile": "C:\\Users\\anush\\Downloads\\e2ee-person1-updated\\e2ee-main\\frontend\\node_modules\\undici-types\\LICENSE"
+  }
+}
+

@@ -420,6 +420,7 @@ export class ChatEngine {
     if (c.identityKey && c.identityKey !== bundle.identity_public) {
       this.flagKeyChange(c, bundle.identity_public, bundle.key_version);
       await this.save();
+      this.emit(); // tell the UI (conversation list, badges) the contact's state changed
       throw new KeyChangedError(peerId);
     }
     try {
@@ -428,6 +429,7 @@ export class ChatEngine {
       if (e instanceof IdentityChangedError) {
         this.flagKeyChange(c, e.newKey, bundle.key_version);
         await this.save();
+        this.emit();
         throw new KeyChangedError(peerId);
       }
       if (e instanceof CipherError) throw new EngineError("The contact's key bundle failed verification, so no session was created.");
@@ -446,6 +448,7 @@ export class ChatEngine {
       await this.checkPeerIdentity(peerId, false);
       if (c.keyChange) {
         await this.save();
+        this.emit();
         throw new KeyChangedError(peerId);
       }
       await this.ensureSession(peerId);
