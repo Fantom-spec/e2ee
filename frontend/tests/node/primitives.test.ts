@@ -118,51 +118,49 @@ describe("vault", () => {
     const reopened = await Vault.unlock("hunter2-hunter2", blob, CTX, LOW);
     assert.equal(JSON.parse(reopened.plaintext).secret, secret);
   });
-  it("uses a fresh payload IV for every seal", async () => {
-    const vault = await Vault.create("hunter2-hunter2", CTX, LOW, LOW);
+  it("uses a fresh IV for every seal", async () => {
+    const vault = await Vault.create("pw-pw-pw-pw-pw", CTX, LOW, LOW);
     const a = await vault.seal("same");
     const b = await vault.seal("same");
-    // wrapping IV (iv) is fixed per vault instance; payload IV should be fresh each time
-    assert.equal(a.iv, b.iv); // wrapping IV same
-    assert.notEqual(a.payloadIv, b.payloadIv); // payload IV fresh
-    assert.notEqual(a.payloadCt, b.payloadCt); // ciphertext different
+    assert.notEqual(a.iv, b.iv);
+    assert.notEqual(a.ct, b.ct);
   });
   it("a wrong password fails", async () => {
-    const vault = await Vault.create("hunter2-hunter2", CTX, LOW, LOW);
+    const vault = await Vault.create("right-password", CTX, LOW, LOW);
     const blob = await vault.seal("data");
     await assert.rejects(Vault.unlock("wrong-password", blob, CTX, LOW), VaultError);
   });
   it("tampering with ciphertext, IV or salt is detected", async () => {
-    const vault = await Vault.create("hunter2-hunter2", CTX, LOW, LOW);
+    const vault = await Vault.create("right-password", CTX, LOW, LOW);
     const blob = await vault.seal("data");
     const flip = (b64: string) => {
       const bytes = fromBase64(b64);
       bytes[0] ^= 1;
       return toBase64(bytes);
     };
-    for (const field of ["payloadCt", "payloadIv", "salt", "iv", "wrappedKey"] as const) {
+    for (const field of ["ct", "iv", "salt"] as const) {
       const tampered: VaultBlob = { ...blob, [field]: flip(blob[field]) };
-      await assert.rejects(Vault.unlock("hunter2-hunter2", tampered, CTX, LOW), VaultError, field);
+      await assert.rejects(Vault.unlock("right-password", tampered, CTX, LOW), VaultError, field);
     }
   });
   it("binds the blob to its context (cannot be moved to another account)", async () => {
-    const vault = await Vault.create("hunter2-hunter2", CTX, LOW, LOW);
+    const vault = await Vault.create("right-password", CTX, LOW, LOW);
     const blob = await vault.seal("data");
-    await assert.rejects(Vault.unlock("hunter2-hunter2", blob, "securechat-vault-v1|user-2", LOW), VaultError);
+    await assert.rejects(Vault.unlock("right-password", blob, "securechat-vault-v1|user-2", LOW), VaultError);
   });
   it("refuses weakened or malformed parameters unless explicitly allowed", async () => {
-    const vault = await Vault.create("hunter2-hunter2", CTX, LOW, LOW);
+    const vault = await Vault.create("right-password", CTX, LOW, LOW);
     const blob = await vault.seal("data");
-    await assert.rejects(Vault.unlock("hunter2-hunter2", blob, CTX, 200_000), VaultError); // higher floor rejects lower iterations
-    await assert.rejects(Vault.create("hunter2-hunter2", CTX, 50_000, 100_000), VaultError); // iterations below minIterations
-    await assert.rejects(Vault.unlock("hunter2-hunter2", { ...blob, iterations: 50_000_000 }, CTX, LOW), VaultError);
-    await assert.rejects(Vault.unlock("hunter2-hunter2", { ...blob, kdf: "x" } as unknown as VaultBlob, CTX, LOW), VaultError);
-    await assert.rejects(Vault.unlock("hunter2-hunter2", null as unknown as VaultBlob, CTX, LOW), VaultError);
+    await assert.rejects(Vault.unlock("right-password", blob, CTX), VaultError); // default floor is 100,000
+    await assert.rejects(Vault.create("pw", CTX, LOW), VaultError);
+    await assert.rejects(Vault.unlock("right-password", { ...blob, iterations: 50_000_000 }, CTX, LOW), VaultError);
+    await assert.rejects(Vault.unlock("right-password", { ...blob, kdf: "x" } as unknown as VaultBlob, CTX, LOW), VaultError);
+    await assert.rejects(Vault.unlock("right-password", null as unknown as VaultBlob, CTX, LOW), VaultError);
   });
   it("a seal after reopening still opens with the same password (salt/iterations preserved)", async () => {
-    const v1 = await Vault.create("hunter2-hunter2", CTX, LOW, LOW);
-    const { vault: v2 } = await Vault.unlock("hunter2-hunter2", await v1.seal("one"), CTX, LOW);
+    const v1 = await Vault.create("right-password", CTX, LOW, LOW);
+    const { vault: v2 } = await Vault.unlock("right-password", await v1.seal("one"), CTX, LOW);
     const second = await v2.seal("two");
-    assert.equal((await Vault.unlock("hunter2-hunter2", second, CTX, LOW)).plaintext, "two");
+    assert.equal((await Vault.unlock("right-password", second, CTX, LOW)).plaintext, "two");
   });
 });
