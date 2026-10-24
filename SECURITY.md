@@ -23,7 +23,7 @@ audited. Do not use it to protect sensitive real-world communications.
 
 * Rate limiting is in-memory and single-process; it resets on restart. Behind Cloudflare Tunnel, per-IP limits only work if `SECURECHAT_TRUST_CF_CONNECTING_IP=true`, which is safe only when the server is reachable exclusively through the tunnel.
 * The session token and the password live in page memory and are readable by any script in the page (XSS = full compromise). No Content-Security-Policy yet (Stage 4).
-* The vault key is derived from the account password, which the server also receives at login. A malicious server could therefore learn it; this is part of the same limit as modified JavaScript.
+* The vault uses a random 256-bit key (generated per browser profile) to encrypt the actual payload; this vault key is then wrapped (encrypted) with a key derived from the account password via PBKDF2-SHA256 (600k iterations). The server receives the password at login, so a malicious server could learn it and, with a copy of the browser's IndexedDB data, unwrap the vault key and decrypt the vault.
 * The encryption library is GPL-3.0, unaudited, and its maintenance status is unverified.
 * Safety numbers are SecureChat's own construction (SHA-512 over ordered user ids and identity keys) and do not interoperate with Signal.
 * The server cannot verify the signed prekey signature; clients do (inside the library).

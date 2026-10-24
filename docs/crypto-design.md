@@ -19,7 +19,7 @@ the React UI, and the frontend tests. Backend and relay are covered by
 | Protocol | Signal protocol: **X3DH** session setup (identity key + signed prekey + one-time prekey) and **Double Ratchet** message protection. No PQXDH. | library: `@privacyresearch/libsignal-protocol-typescript` 0.0.16 |
 | Our code's role | Store state, map library calls and errors to our interface. **No cryptographic primitive, KDF, cipher composition or ratchet is written by us.** | `crypto/signal.ts`, `crypto/cipher.ts` |
 | Chat logic | Dedup, persistence ordering, trust decisions, outbox, quarantine | `crypto/engine.ts` |
-| Local secrets | One JSON state object (identity private key, prekeys, sessions, contacts, history) sealed with AES-256-GCM under a PBKDF2-SHA256 (600 000 iterations) key from the account password, stored in IndexedDB | `crypto/vault.ts`, `crypto/idb.ts` |
+| Local secrets | One JSON state object (identity private key, prekeys, sessions, contacts, history) sealed with AES-256-GCM under a **random 256-bit vault key**; the vault key is wrapped (encrypted) with AES-256-GCM under a PBKDF2-SHA256 (600 000 iterations) key derived from the account password. Stored in IndexedDB. | `crypto/vault.ts`, `crypto/idb.ts` |
 | Identity verification | Trust on first use (TOFU) plus a safety number the users compare out of band | `crypto/fingerprint.ts`, `SafetyPanel.tsx` |
 | Wire format | `base64(JSON{v:1, t:1\|3, b:base64 ciphertext})`; plaintext is `JSON{v:1, text, sent_at}` encrypted by the Signal session | `crypto/envelope.ts` |
 
@@ -127,7 +127,7 @@ No source of the library is copied into this repository.
 | Tampered or truncated ciphertext is rejected, nothing shown | Library MAC check; engine discards and records a notice | Engine behaviour executed (fake cipher). Library MAC behaviour: tests written, **not run** |
 | Replays and duplicates do not show twice | Dedup by id before decryption (executed) and library one-time message keys (not run) | Partly executed |
 | Identity change is detected, blocks sending, holds messages, resets verification | Engine logic | Executed (fake cipher), including across a restart |
-| Local keys and history are encrypted at rest | AES-256-GCM + PBKDF2 vault | Vault logic executed; IndexedDB never run |
+| Local keys and history are encrypted at rest | AES-256-GCM + PBKDF2 vault with **key wrapping** (random vault key wrapped by password-derived key) | Vault logic executed; IndexedDB never run |
 | Forward secrecy, post-compromise security | Properties of the Double Ratchet as implemented by the library | **Not claimed.** The out-of-order and "same plaintext, different ciphertext" tests show the ratchet advancing, but there is no test that models a key compromise |
 
 ## 5. Security limitations
@@ -139,10 +139,7 @@ No source of the library is copied into this repository.
 3. **XSS:** any script in the page can read the in-memory password, session token and decrypted
    history. No Content-Security-Policy yet. A CSP meta tag was deliberately not added: it would break
    the Vite dev server and could not be tested here.
-4. **Password is also the vault key.** The server receives the password at login, so a malicious
-   server can learn it and, with a copy of the browser data, open the vault. There is no
-   change-password flow (changing it later would lock the vault) and no recovery: forgetting it
-   loses keys and history.
+4. **Password is also used to wrap the vault key.** The server receives the password at login, so a malicious server can learn it. The vault uses a random 256-bit key (generated per browser profile) to encrypt the actual payload; this vault key is then wrapped (encrypted) with a key derived from the account password via PBKDF2-SHA256 (600k iterations). A malicious server with a copy of the browser's IndexedDB data could unwrap the vault key and decrypt the vault. There is no change-password flow (changing it later would require re-wrapping the vault key) and no recovery: forgetting the password loses keys and history.
 5. **TOFU:** the first key seen is trusted. A malicious relay can substitute keys at first contact
    until users compare safety numbers. The UI warns about unverified contacts but does not force
    verification.
@@ -162,7 +159,7 @@ No source of the library is copied into this repository.
 
 ## 6. UI behaviour summary
 
-* **Login/registration:** `AuthScreen`; warns that the password also unlocks local keys.
+* **Login/registration:** `AuthScreen`; warns that the password is used to wrap (encrypt) the local vault key, not directly as the encryption key.
 * **Contacts and conversations:** sidebar lists conversations with trust badge and last-message
   preview; search by username prefix starts a conversation.
 * **Chat:** delivery status shown as symbol plus word (`…` sending, `✓` sent to relay, `✓✓`

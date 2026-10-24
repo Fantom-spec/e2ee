@@ -30,3 +30,19 @@ frontend/dist/
 *.zip
 .DS_Store
 Thumbs.db
+# Local runtime state
+*.log
+logs/
+coverage/
+htmlcov/
+
+# Local secrets and credentials
+secrets/
+credentials/
+*.p12
+*.pfx
+
+# Local test and tool caches
+.mypy_cache/
+.ruff_cache/
+.vscode/
